@@ -3130,8 +3130,9 @@ add_entrypoint_object(
   DEPENDS
     libc.src.__support.macros.properties.types
     libc.src.__support.FPUtil.sqrt
+    libc.src.__support.FPUtil.multiply_add
   COMPILE_OPTIONS
-    -O3
+    -O3 -march=native
   )
 
 add_entrypoint_object(
