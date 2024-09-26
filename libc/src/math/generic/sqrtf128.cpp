@@ -14,7 +14,6 @@
 #include "src/__support/uint128.h"
 #include "src/__support/macros/properties/cpu_features.h"
 
-#include <stdio.h>
 #include <fenv.h>
 #include <x86intrin.h>
 
@@ -153,7 +152,6 @@ namespace LIBC_NAMESPACE_DECL {
     m = _mm_sub_epi32(m, off);
     m = _mm_xor_si128(m, sexp);
     __m128 mf = cpp::bit_cast<__m128>(m);
-    //    printf("%016lx %016lx %a\n",u.b[1],u.b[0],mf[0]);
     mf = _mm_rsqrt_ss(mf); // get first approximation of reciprocal square root
     u.a <<= 16;
     m = cpp::bit_cast<__m128i>(mf);
@@ -162,11 +160,9 @@ namespace LIBC_NAMESPACE_DECL {
     u32 shft = 2 - i;
     u.a >>= shft;
     u.b[1] |= 1ul<<(62+i);
-    //    printf("%016lx %016lx %a\n",u.b[1],u.b[0],mf[0]);
 
     u64 R = r, r2 = (u64)r*r;
     i64 h = mhuu(u.b[1],r2)<<2; // approximation correction
-    //    printf("%016lx\n",h);
     u64 h2 = mhii(h,h);
     i64 h3 = (u128)h2*h>>64;
     u64 h4 = (h2>>16)*(h2>>16);
@@ -176,17 +172,14 @@ namespace LIBC_NAMESPACE_DECL {
     u64 dR = mhii(h,R);
     R <<= 1;
     R -= dR;
-    //    printf("%016lx\n",R);
 
     u128 sx = mhuU(R, u.a);
     i128 H  = mhuU(R, sx)<<2;
-    //    printf("%016lx %016lx\n",(i64)(H>>64),(i64)H);
     i64 hh = (i64)(H>>(14+32+2)), hh2 = 3*(hh*hh);
     H -= hh2>>(38-4);
     i128 ds = mhIU(H, sx);
     sx <<= 1;
     int128_64_32 v; v.a = sx - ds;
-    //    printf("%016lx %016lx\n",v.b[1],v.b[0]);
 
     u32 rm = flagp&_MM_ROUND_MASK, nrst = rm == _MM_ROUND_NEAREST;
     shft = 49 + nrst;
