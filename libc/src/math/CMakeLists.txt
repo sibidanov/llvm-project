@@ -115,6 +115,7 @@ add_math_entrypoint_object(erff)
 add_math_entrypoint_object(exp)
 add_math_entrypoint_object(expf)
 add_math_entrypoint_object(expf16)
+add_math_entrypoint_object(expf128)
 
 add_math_entrypoint_object(exp2)
 add_math_entrypoint_object(exp2f)

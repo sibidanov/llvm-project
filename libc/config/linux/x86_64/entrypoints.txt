@@ -762,6 +762,7 @@ if(LIBC_TYPES_HAS_FLOAT128)
     libc.src.math.truncf128
     libc.src.math.ufromfpf128
     libc.src.math.ufromfpxf128
+    libc.src.math.expf128
   )
 endif()
 

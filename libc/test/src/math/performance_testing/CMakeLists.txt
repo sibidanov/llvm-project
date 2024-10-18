@@ -511,3 +511,16 @@ add_perf_binary(
   COMPILE_OPTIONS
   -fno-builtin
 )
+
+add_perf_binary(
+  expf128_perf
+  SRCS
+    expf128_perf.cpp
+  DEPENDS
+    .single_input_single_output_diff
+    libc.src.math.sqrtf128
+    libc.src.math.expf128
+    libc.src.stdlib.rand
+  COMPILE_OPTIONS
+  -fno-builtin
+)

@@ -953,6 +953,19 @@ add_fp_unittest(
 )
 
 add_fp_unittest(
+  expf128_test
+  NEED_MPFR
+  SUITE
+    libc-math-unittests
+  SRCS
+    expf128_test.cpp
+  DEPENDS
+    libc.src.math.expf128
+    libc.src.stdlib.rand
+)
+
+
+add_fp_unittest(
   exp2_test
   NEED_MPFR
   SUITE

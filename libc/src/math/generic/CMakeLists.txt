@@ -3136,6 +3136,19 @@ add_entrypoint_object(
   )
 
 add_entrypoint_object(
+  expf128
+  SRCS
+    expf128.cpp
+  HDRS
+    ../expf128.h
+  DEPENDS
+    libc.src.__support.macros.properties.types
+    libc.src.__support.FPUtil.multiply_add
+  COMPILE_OPTIONS
+    -O3 -march=native
+  )
+
+add_entrypoint_object(
   remquof
   SRCS
     remquof.cpp
