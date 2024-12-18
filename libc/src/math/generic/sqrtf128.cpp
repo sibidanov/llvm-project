@@ -104,71 +104,64 @@ namespace LIBC_NAMESPACE_DECL {
 
   // for low precision approxmation use 64x64->64 bit multiplication
   static inline u64 rsqrt9(u64 m){
-    static const u64 c[][2] = {
-      {0xffffffff7848373eul, 0x01ffffef0133d347ul}, {0xfe05ec4488ed02e5ul, 0x01f43adcfb4b1581ul},
-      {0xfc176440ea358a60ul, 0x01e8e77d522cf376ul}, {0xfa33f94036efa6a0ul, 0x01ddffe5430c9859ul},
-      {0xf85b42462df88906ul, 0x01d37e8de98e3abbul}, {0xf68cdbaedb54a44aul, 0x01c95e4c515be4feul},
-      {0xf4c866d6500b3d58ul, 0x01bf9a4a4394f4b2ul}, {0xf30d89c7370219b6ul, 0x01b62dffbc528b6dul},
-      {0xf15beeefa7aafc3bul, 0x01ad152cf6ce9ebdul}, {0xefb344dba7bdfcdful, 0x01a44bd500c19009ul},
-      {0xee133df4dbc0e158ul, 0x019bce38c74e23daul}, {0xec7b9046f2f9fefdul, 0x019398d2915e91dbul},
-      {0xeaebf54866d9df85ul, 0x018ba851dcaf174aul}, {0xe96429a7300fa501ul, 0x0183f99793f1a3a9ul},
-      {0xe7e3ed191c8893a3ul, 0x017c89b2958097a0ul}, {0xe66b022f79ad86c6ul, 0x017555dc83010088ul},
-      {0xe4f92e2dcd6734caul, 0x016e5b76d3236cd8ul}, {0xe38e38e35ee5ebedul, 0x016798081f68fd6dul},
-      {0xe229ec8755f177cdul, 0x01610939a873ca82ul}, {0xe0cc15973cb5db88ul, 0x015aacd50bf8b9d8ul},
-      {0xdf7482b7b4aabedcul, 0x015480c227e7ca2bul}, {0xde2304973364f158ul, 0x014e830526d09a66ul},
-      {0xdcd76dd29fe88038ul, 0x0148b1bcb1ed4a4cul}, {0xdb9192dbac7a3125ul, 0x01430b2045973cdcul},
-      {0xda5149e0cc030903ul, 0x013d8d7ea5390f11ul}, {0xd9166ab6a4e0e528ul, 0x0138373c6c18624ful},
-      {0xd7e0cec2e5841468ul, 0x013306d2b891e542ul}, {0xd6b050e861825c27ul, 0x012dfacdef9b2acbul},
-      {0xd584cd745fda2d50ul, 0x012911cc969126edul}, {0xd45e220d050289dcul, 0x01244a7e41883478ul},
-      {0xd33c2da0c51a2addul, 0x011fa3a2947be80dul}, {0xd21ed056cc17389ful, 0x011b1c0855e242b1ul},
-      {0xd105eb804b444256ul, 0x0116b28c91476ab0ul}, {0xcff1618a9ca2919bul, 0x01126619c8b562fcul},
-      {0xcee115f22df892c2ul, 0x010e35a733c69b06ul}, {0xcdd4ed3626679b15ul, 0x010a20380b5af461ul},
-      {0xccccccccba615501ul, 0x010624dae0fd45c6ul}, {0xcbc89b1822bcc073ul, 0x010242a9011bb343ul},
-      {0xcac83f5c2c7f0208ul, 0x00fe78c5df47a01dul}, {0xc9cba1b457aef7acul, 0x00fac65e8bc2ba09ul},
-      {0xc8d2ab0a7c3d50d3ul, 0x00f72aa931add201ul}, {0xc7dd450decaf2e4aul, 0x00f3a4e49d3c0c30ul},
-      {0xc6eb5a2b0ed05ed8ul, 0x00f03457c9598961ul}, {0xc5fcd583633d57baul, 0x00ecd8517440272ful},
-      {0xc511a2e5f5151a02ul, 0x00e99027ba7f6d94ul}, {0xc429aec82b9944faul, 0x00e65b37b8065054ul},
-      {0xc344e63ef7ef8028ul, 0x00e338e52ec627f5ul}, {0xc26336f8599bf5d0ul, 0x00e0289a328e43f1ul},
-      {0xc1848f3534a97f36ul, 0x00dd29c6d9c6c8c4ul}, {0xc0a8ddc374ca0ae5ul, 0x00da3be0f2b84044ul},
-      {0xbfd011f87909412ful, 0x00d75e63bd1367ceul}, {0xbefa1babc3f5037eul, 0x00d490cfa7726b5eul},
-      {0xbe26eb31ec639422ul, 0x00d1d2aa1091ea10ul}, {0xbd567157cb3e6e11ul, 0x00cf237d0c04e2c5ul},
-      {0xbc889f5de2f37db4ul, 0x00cc82d72a2b07d4ul}, {0xbbbd66f3fd64e23ful, 0x00c9f04b4334ffc2ul},
-      {0xbaf4ba34fd61f809ul, 0x00c76b704505ce82ul}, {0xba2e8ba2e0e3754bul, 0x00c4f3e103c40dfcul},
-      {0xb96ace22f170230cul, 0x00c2893c0cf0c3a8ul}, {0xb8a974fa203874c0ul, 0x00c02b237cdc8a2cul},
-      {0xb7ea73c98b9d2dd5ul, 0x00bdd93cd65675adul}, {0xb72dbe8b2bf89b85ul, 0x00bb9330dc729598ul},
-      {0xb673498ea5a2dce5ul, 0x00b958ab6e484260ul}, {0xb5bb09763e48710bul, 0x00b7295b648a85f9ul},
-      {0xb504f333f3c6f565ul, 0x00b504f270dee576ul}};
-    static const u32 ch[][2] = {
-      {0xbff55815, 0x9bb5b6e7}, {0xb8a95a89, 0x938bf8f0}, {0xb1bf4705, 0x8bed0079}, {0xab309d4a, 0x84cdb431},
-      {0xa4f76232, 0x7e24037b}, {0x9f0e1340, 0x77e6ca62}, {0x996f9b96, 0x720db8df}, {0x94174a00, 0x6c913cff},
-      {0x8f00c812, 0x676a6f92}, {0x8a281226, 0x62930308}, {0x8589702c, 0x5e05343e}, {0x81216f2e, 0x59bbbcf8},
-      {0x7cecdb76, 0x55b1c7d6}, {0x78e8bb45, 0x51e2e592}, {0x75124a0a, 0x4e4b0369}, {0x7166f40f, 0x4ae66284},
-      {0x6de45288, 0x47b19045}, {0x6a882804, 0x44a95f5f}, {0x67505d2a, 0x41cae1a0}, {0x643afdc8, 0x3f13625c},
-      {0x6146361f, 0x3c806169}, {0x5e70506d, 0x3a0f8e8e}, {0x5bb7b2b1, 0x37bec572}, {0x591adc9a, 0x358c09e2},
-      {0x569865a7, 0x33758476}, {0x542efb6a, 0x31797f8a}, {0x51dd5ffb, 0x2f96647a}, {0x4fa2687c, 0x2dcab91f},
-      {0x4d7cfbc9, 0x2c151d8a}, {0x4b6c1139, 0x2a7449ef}, {0x496eaf82, 0x28e70cc3}, {0x4783eba7, 0x276c4900},
-      {0x45aae80a, 0x2602f493}, {0x43e2d382, 0x24aa16ec}, {0x422ae88c, 0x2360c7af}, {0x40826c88, 0x22262d7b},
-      {0x3ee8af07, 0x20f97cd2}, {0x3d5d0922, 0x1fd9f714}, {0x3bdedce0, 0x1ec6e994}, {0x3a6d94a9, 0x1dbfacbb},
-      {0x3908a2be, 0x1cc3a33b}, {0x37af80bf, 0x1bd23960}, {0x3661af39, 0x1aeae458}, {0x351eb539, 0x1a0d21a2},
-      {0x33e61feb, 0x19387676}, {0x32b7823a, 0x186c6f3e}, {0x3192747d, 0x17a89f21}, {0x30769424, 0x16ec9f89},
-      {0x2f63836f, 0x16380fbf}, {0x2e58e925, 0x158a9484}, {0x2d567053, 0x14e3d7ba}, {0x2c5bc811, 0x1443880e},
-      {0x2b68a346, 0x13a958ab}, {0x2a7cb871, 0x131500ee}, {0x2997c17a, 0x12863c29}, {0x28b97b82, 0x11fcc95c},
-      {0x27e1a6b4, 0x11786b03}, {0x2710061d, 0x10f8e6da}, {0x26445f86, 0x107e05ac}, {0x257e7b4d, 0x10079327},
-      {0x24be2445, 0x0f955da9}, {0x24032795, 0x0f273620}, {0x234d5496, 0x0ebcefdb}, {0x229c7cbc, 0x0e56606e},
-      {0x21f07377, 0x0df35f8b} };
-
-    u64 indx = m>>58;
-    u64 c3 = ch[indx][1], c0 = c[indx][0], c1 = c[indx][1], c2 = ch[indx][0];
-    u64 d = (m<<6)>>32;
-    u64 d2 = ((u64)(d*d))>>32;
-    u64 re = c0 + (d2*c2>>13);
-    u64 ro = d*((c1 + ((d2*c3)>>19))>>26)>>6;
-    u64 r = re - ro; // error < 1e-7
+    static const unsigned c[][4] = {
+      {0xffffffff, 0xfffff780, 0xbff55815, 0x9bb5b6e7}, {0xfc0bd889, 0xfa1d6e7d, 0xb8a95a89, 0x938bf8f0},
+      {0xf82ec882, 0xf473bea9, 0xb1bf4705, 0x8bed0079}, {0xf467f280, 0xeefff2a1, 0xab309d4a, 0x84cdb431},
+      {0xf0b6848c, 0xe9bf46f4, 0xa4f76232, 0x7e24037b}, {0xed19b75e, 0xe4af2628, 0x9f0e1340, 0x77e6ca62},
+      {0xe990cdad, 0xdfcd2521, 0x996f9b96, 0x720db8df}, {0xe61b138e, 0xdb16ffde, 0x94174a00, 0x6c913cff},
+      {0xe2b7dddf, 0xd68a967b, 0x8f00c812, 0x676a6f92}, {0xdf6689b7, 0xd225ea80, 0x8a281226, 0x62930308},
+      {0xdc267bea, 0xcde71c63, 0x8589702c, 0x5e05343e}, {0xd8f7208e, 0xc9cc6948, 0x81216f2e, 0x59bbbcf8},
+      {0xd5d7ea91, 0xc5d428ee, 0x7cecdb76, 0x55b1c7d6}, {0xd2c8534e, 0xc1fccbc9, 0x78e8bb45, 0x51e2e592},
+      {0xcfc7da32, 0xbe44d94a, 0x75124a0a, 0x4e4b0369}, {0xccd6045f, 0xbaaaee41, 0x7166f40f, 0x4ae66284},
+      {0xc9f25c5c, 0xb72dbb69, 0x6de45288, 0x47b19045}, {0xc71c71c7, 0xb3cc040f, 0x6a882804, 0x44a95f5f},
+      {0xc453d90f, 0xb0849cd4, 0x67505d2a, 0x41cae1a0}, {0xc1982b2e, 0xad566a85, 0x643afdc8, 0x3f13625c},
+      {0xbee9056f, 0xaa406113, 0x6146361f, 0x3c806169}, {0xbc46092e, 0xa7418293, 0x5e70506d, 0x3a0f8e8e},
+      {0xb9aedba5, 0xa458de58, 0x5bb7b2b1, 0x37bec572}, {0xb72325b7, 0xa1859022, 0x591adc9a, 0x358c09e2},
+      {0xb4a293c2, 0x9ec6bf52, 0x569865a7, 0x33758476}, {0xb22cd56d, 0x9c1b9e36, 0x542efb6a, 0x31797f8a},
+      {0xafc19d86, 0x9983695c, 0x51dd5ffb, 0x2f96647a}, {0xad60a1d1, 0x96fd66f7, 0x4fa2687c, 0x2dcab91f},
+      {0xab099ae9, 0x9488e64b, 0x4d7cfbc9, 0x2c151d8a}, {0xa8bc441a, 0x92253f20, 0x4b6c1139, 0x2a7449ef},
+      {0xa6785b42, 0x8fd1d14a, 0x496eaf82, 0x28e70cc3}, {0xa43da0ae, 0x8d8e042a, 0x4783eba7, 0x276c4900},
+      {0xa20bd701, 0x8b594648, 0x45aae80a, 0x2602f493}, {0x9fe2c315, 0x89330ce4, 0x43e2d382, 0x24aa16ec},
+      {0x9dc22be4, 0x871ad399, 0x422ae88c, 0x2360c7af}, {0x9ba9da6c, 0x85101c05, 0x40826c88, 0x22262d7b},
+      {0x99999999, 0x83126d70, 0x3ee8af07, 0x20f97cd2}, {0x97913630, 0x81215480, 0x3d5d0922, 0x1fd9f714},
+      {0x95907eb8, 0x7f3c62ef, 0x3bdedce0, 0x1ec6e994}, {0x93974369, 0x7d632f45, 0x3a6d94a9, 0x1dbfacbb},
+      {0x91a55615, 0x7b955498, 0x3908a2be, 0x1cc3a33b}, {0x8fba8a1c, 0x79d2724e, 0x37af80bf, 0x1bd23960},
+      {0x8dd6b456, 0x781a2be4, 0x3661af39, 0x1aeae458}, {0x8bf9ab07, 0x766c28ba, 0x351eb539, 0x1a0d21a2},
+      {0x8a2345cc, 0x74c813dd, 0x33e61feb, 0x19387676}, {0x88535d90, 0x732d9bdc, 0x32b7823a, 0x186c6f3e},
+      {0x8689cc7e, 0x719c7297, 0x3192747d, 0x17a89f21}, {0x84c66df1, 0x70144d19, 0x30769424, 0x16ec9f89},
+      {0x83091e6a, 0x6e94e36c, 0x2f63836f, 0x16380fbf}, {0x8151bb87, 0x6d1df079, 0x2e58e925, 0x158a9484},
+      {0x7fa023f1, 0x6baf31de, 0x2d567053, 0x14e3d7ba}, {0x7df43758, 0x6a4867d3, 0x2c5bc811, 0x1443880e},
+      {0x7c4dd664, 0x68e95508, 0x2b68a346, 0x13a958ab}, {0x7aace2b0, 0x6791be86, 0x2a7cb871, 0x131500ee},
+      {0x79113ebc, 0x66416b95, 0x2997c17a, 0x12863c29}, {0x777acde8, 0x64f825a1, 0x28b97b82, 0x11fcc95c},
+      {0x75e9746a, 0x63b5b822, 0x27e1a6b4, 0x11786b03}, {0x745d1746, 0x6279f081, 0x2710061d, 0x10f8e6da},
+      {0x72d59c46, 0x61449e06, 0x26445f86, 0x107e05ac}, {0x7152e9f4, 0x601591be, 0x257e7b4d, 0x10079327},
+      {0x6fd4e793, 0x5eec9e6b, 0x24be2445, 0x0f955da9}, {0x6e5b7d16, 0x5dc9986e, 0x24032795, 0x0f273620},
+      {0x6ce6931d, 0x5cac55b7, 0x234d5496, 0x0ebcefdb}, {0x6b7612ec, 0x5b94adb2, 0x229c7cbc, 0x0e56606e},
+    };
+    // The range [1,2] is splitted into 64 equal sub-ranges and the
+    // reciprocal square root is approximated by a cubic polynomial by
+    // the minimax method in each subrange. The approximation accuracy
+    // fits into 32-33 bits and thus it is natural to round
+    // coefficients into 32 bit. The constant coefficient can be
+    // rounded to 33 bits since the most significant bit is always 1
+    // and implicitly assumed in the table.
+    u64 indx = m>>58; // subrange index 
+    u64 c3 = c[indx][3], c0 = c[indx][0], c1 = c[indx][1], c2 = c[indx][2];
+    c0 <<= 31; // to 64 bit with the space for the implicit bit
+    c0 |= 1ul<<63; // add implicit bit
+    c1 <<= 25; // to 64 bit format
+    u64 d = (m<<6)>>32; // local coordinate in the subrange [0, 2^32]
+    u64 d2 = ((u64)(d*d))>>32; // square of the local coordinate
+    u64 re = c0 + (d2*c2>>13); // even part of the polynomial (positive)
+    u64 ro = d*((c1 + ((d2*c3)>>19))>>26)>>6; // odd part of the polynomial (negative)
+    u64 r = re - ro; // maximal error < 1.55e-10 and it is less than 2^-32
+    // Newton-Raphson first order step to improve accuracy of the result to almost 64 bits
+    // r1 = r0 - r0*(r0^2*x - 1)/2
     u64 r2 = mhuu(r,r);
-    i64 h = mhuu(m,r2) + r2;
-    i64 hr = mhii(h,r>>1);
+    i64 h = mhuu(m,r2) + r2; // h = r0^2*x - 1
+    i64 hr = mhii(h,r>>1); // r0*h/2
     r -= hr;
-    if(unlikely(!r)) r--;
+    if(unlikely(!r)) r--; // adjust in the unlucky case x~1
     return r;
   }
 
