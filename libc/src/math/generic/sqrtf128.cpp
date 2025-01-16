@@ -102,6 +102,7 @@ namespace LIBC_NAMESPACE_DECL {
     return mhUIm(_a,_b,(u64)(_b>>127));
   }
 
+#if 0
   // for low precision approxmation use 64x64->64 bit multiplication
   static inline u64 rsqrt9(u64 m){
     static const unsigned c[][4] = {
@@ -164,6 +165,30 @@ namespace LIBC_NAMESPACE_DECL {
     if(unlikely(!r)) r--; // adjust in the unlucky case x~1
     return r;
   }
+#endif
+  static inline u64 rsqrt10(u64 m){
+    // The reciprocal square root is approximated by a 12th degree
+    // polynomial by the minimax method in the range [1,2].
+    static const unsigned long c[] =
+      {0xb5947a4a, 0x2d651e32, 0x9ad50532, 0x2d28d093, 0x0d8be653, 0x04239014,
+       0x01492449, 0x0066ff7d, 0x001e74a1, 0x000984cc, 0x00049abc, 0x00018340};
+    i64 x = m^(1ul<<63), x_26 = x>>2, z = x>>31;
+    if(unlikely(z<=-4294967296l)) return ~0l - (m>>1);
+    u64 x2 = z*z, x2_26 = x2>>5;
+    x2 >>= 32;
+    u64 o1 = c[0]+(x2*(c[2]+(x2*(c[4]+(x2*(c[6]+(x2*(c[8]+(x2*c[10]>>32))>>32))>>32))>>32))>>32);
+    i64 o = (x>>34)*(o1>>3)+x_26; // odd part of the polynomial (negative)
+    u64 e = 0xd105eb806655d608ul+(x2*(c[1]+(x2*(c[3]+(x2*(c[5]+(x2*(c[7]+(x2*(c[9]+(x2*c[11]>>32))>>32))>>32))>>32))>>32))>>6)+x2_26; // even part of the polynomial (positive)
+    u64 r = e - o; // error < 1.5e-10
+    // Newton-Raphson first order step to improve accuracy of the result to almost 64 bits
+    // r1 = r0 - r0*(r0^2*x - 1)/2
+    u64 r2 = mhuu(r,r);
+    i64 h = mhuu(m,r2) + r2; // h = r0^2*x - 1
+    i64 hr = mhii(h,r>>1); // r0*h/2
+    r -= hr;
+    //    if(unlikely(!r)) r--; // adjust in the unlucky case x~1
+    return r;
+  }
 
   LLVM_LIBC_FUNCTION(float128, sqrtf128, (float128 x)) {
     using FPBits = fputil::FPBits<float128>;
@@ -211,7 +236,7 @@ namespace LIBC_NAMESPACE_DECL {
 
     u.a <<= 16;
     const u64 rsqrt_2[] = {~0ul,0xb504f333f9de6484}; // 2^64/sqrt(2)
-    u64 rx = u.b[1], r = rsqrt9(rx);
+    u64 rx = u.b[1], r = rsqrt10(rx);
     u128 r2 = (u128)r*rsqrt_2[i];
     unsigned shft = 2-i;
     u.a >>= shft;
